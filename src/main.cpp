@@ -1,15 +1,5 @@
 // Peguei o exemplo da doc do SDL, vou fazer com base nela
 
-/* clear.c ... */
-
-/*
- * This example code creates an SDL window and renderer, and then clears the
- * window to a different color every frame, so you'll effectively get a window
- * that's smoothly fading between colors.
- *
- * This code is public domain. Feel free to use it for any purpose!
- */
-
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -18,6 +8,13 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
+typedef struct AppState {
+    
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    // fica em aberto sobre como fazer os estados
+};
+
 SDL_FRect reta;
 
 /* This function runs once at startup. */
@@ -25,16 +22,21 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
     SDL_SetAppMetadata("Example Renderer Clear", "1.0", "com.example.renderer-clear");
 
+    AppState* state = new AppState();
+
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", 640, 480, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("Criação de janela e renderizador", 640, 480, SDL_WINDOW_RESIZABLE, &state->window, &state->renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-    SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    
+    SDL_SetRenderLogicalPresentation(state->renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+    *appstate = state;
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
@@ -55,9 +57,11 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-    SDL_SetRenderDrawColor(renderer, 33, 33, 33, SDL_ALPHA_OPAQUE);
+    AppState* state = static_cast<AppState*>(appstate);
 
-    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(state->renderer, 33, 33, 33, SDL_ALPHA_OPAQUE);
+
+    SDL_RenderClear(state->renderer);
 
     reta.x = reta.y = 100;
 
@@ -65,12 +69,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     reta.h = 200;
 
-    SDL_SetRenderDrawColor(renderer, 50, 20, 100, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(state->renderer, 50, 20, 100, SDL_ALPHA_OPAQUE);
 
-    SDL_RenderFillRect(renderer, &reta);
+    SDL_RenderFillRect(state->renderer, &reta);
 
     /* put the newly-cleared rendering on the screen. */
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(state->renderer);
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
