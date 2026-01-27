@@ -15,8 +15,6 @@ typedef struct AppState {
     // fica em aberto sobre como fazer os estados
 };
 
-SDL_FRect reta;
-
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -58,23 +56,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppState* state = static_cast<AppState*>(appstate);
-
-    SDL_SetRenderDrawColor(state->renderer, 33, 33, 33, SDL_ALPHA_OPAQUE);
-
-    SDL_RenderClear(state->renderer);
-
-    reta.x = reta.y = 100;
-
-    reta.w = 200;
-
-    reta.h = 200;
-
-    SDL_SetRenderDrawColor(state->renderer, 50, 20, 100, SDL_ALPHA_OPAQUE);
-
-    SDL_RenderFillRect(state->renderer, &reta);
-
-    /* put the newly-cleared rendering on the screen. */
-    SDL_RenderPresent(state->renderer);
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
