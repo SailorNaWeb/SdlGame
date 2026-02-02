@@ -6,46 +6,37 @@ class Renderer3D {
 
 	void addPoligon(Poligon* poligon) {
 	    
-	    if (vertex == NULL) {
-
-		vertex = (float*)malloc(poligon->getVertexQnt() * 7 * sizeof(float));
+	    if (poligonos == NULL) {
 		
-		memcpy(vertex, poligon->getVertex(), poligon->getVertexQnt() * 7);
+		poligonos = malloc(sizeof(Poligon*));
 
-		vertex_size = poligon->getVertexQnt();
+		poligonos[0] = poligon;
+
+		poligonos_size = 1;
+
+		poligon->index = poligonos_size - 1;
 	    } else {
-		
-		int new_vertex_size = vertex_size + poligon->getVertexQnt();
 
-		float* tempPointer = (float*)realloc(vertex,  new_vertex_size * 7);
-		vertex = tempPointer;
+		Poligon* array_temp = realloc(poligonos, ++poligonos_size);
 
-		tempPointer = vertex + vertex_size * 7 + 1;
-		memcpy(tempPointer, poligon->getVertex(), poligon->getVertexQnt() * 7);
-	    
-		vertex_size = new_vertex_size;
+		poligonos = array_temp;
+
+		poligonos[poligonos_size - 1] = poligon;
+
+		poligon->index = poligonos_size - 1;
 	    }
-
-	    if (objects == NULL) {
-		objects_size = 0;
-
-		objects = (int*)malloc(sizeof(int));
-	    } else {
-		int* tempPointer = (int*)realloc(objects, objects_size + 1);
-
-		objects = tempPointer;
-	    }
-
-	    objects[objects_size] = vertex_size - poligon->getVertexQnt();
-
-	    poligon->index = objects_size;
-
-	    objects_size++;
 	}
 
 	void removePoligon(Poligon* poligon) {
-	    
+	    for (int i = poligon->index; i < poligonos_size - 1; i++) {
+		poligonos[i] = poligonos[i + 1];
+		poligonos[i]->index--;
+	    }
 
+	    Poligon* array_temp = realloc(poligonos, --poligonos_size);
+
+	    poligonos = array_temp;
+	   
 	}
 
 	void render() {
@@ -53,11 +44,8 @@ class Renderer3D {
 	}
 
     private:
-	float* vertex;
-	int vertex_size;
-	
-	int* objects;
-	int objects_size;
+	Poligon* poligonos;
+	int poligonos_size;
 
 	char* vertex_shader;
 	char* fragment_shader;
